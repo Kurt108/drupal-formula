@@ -2,6 +2,7 @@
 
 include:
   - drupal
+  - drupal.{{ drupal.database }}
 
 
 
@@ -12,6 +13,8 @@ include:
     - source: salt://drupal/files/{{ library }}.php
     - user: {{ drupal.user }}
     - group: {{ drupal.user }}
+    - require:
+      - sls: drupal.{{ drupal.database }}
     - makedirs: True
 {% endfor %}
 

@@ -2,6 +2,7 @@
 
 include:
   - drupal
+  - drupal.{{ drupal.database }}
 
 
 {% for modul in drupal.modules %}
@@ -11,6 +12,8 @@ include:
     - cwd: {{ drupal.doc_root }}/drupal-{{ drupal.version }}
     - creates: {{ drupal.doc_root }}/drupal-{{ drupal.version }}/sites/all/module-installed-{{ modul }}
     - user: {{ drupal.user }}
+    - require:
+      - sls: drupal.{{ drupal.database }}
     - watch_in:
       - cmd: drupal-clear-cache
       - cmd: drupal-updatedb
