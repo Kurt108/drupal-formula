@@ -1,0 +1,95 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: salt_solo
+  formula: drupal
+
+
+  dependancies:
+    - path: '../mysql-formula'
+      name: 'mysql'
+    - path: '../php-formula'
+      name: 'php'
+    - path: '../nginx-formula'
+      name: 'nginx'
+
+suites:
+  - name: default
+    provisioner:
+      pillars-from-files:
+        base.sls: pillar.example
+      pillars:
+        top.sls:
+          base:
+            '*':
+              - base
+              - sqlite
+        sqlite.sls:
+          drupal:
+            lookup:
+              database: 'sqlite'
+      state_top:
+        base:
+          '*':
+            - drupal
+            - drupal.installation
+            - drupal.librarys
+            - drupal.modules
+            - drupal.cron
+            - php.fpm
+            - php.ng.fpm.config
+            - php.ng.fpm.pools
+            - php.ng.fpm.pools_config
+            - nginx.ng
+            - nginx.ng.config
+            - nginx.ng.service
+            - nginx.ng.vhosts
+            - nginx.ng.vhosts_config
+
+  - name: default_mysql
+    provisioner:
+      pillars-from-files:
+        base.sls: pillar.example
+      pillars:
+        top.sls:
+          base:
+            '*':
+              - base
+              - mysql
+        mysql.sls:
+          drupal:
+            lookup:
+              database: 'mysql'
+      state_top:
+        base:
+          '*':
+            - drupal.mysql
+            - drupal.installation
+            - drupal.librarys
+            - drupal.modules
+            - drupal.cron
+            - mysql.server
+            - mysql.database
+            - mysql.user
+            - mysql.client
+            - php.fpm
+            - php.ng.fpm.config
+            - php.ng.fpm.pools
+            - php.ng.fpm.pools_config
+            - nginx.ng
+            - nginx.ng.config
+            - nginx.ng.service
+            - nginx.ng.vhosts
+            - nginx.ng.vhosts_config
+
+
+platforms:
+  - name: ubuntu-12.04
+    driver:
+      image_id: ami-812b43f6
+      username: ubuntu
+
+transport:
+  ssh_key: '~/.ssh/kitchen-aws.pem'
