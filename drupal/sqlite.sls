@@ -2,28 +2,28 @@
 
 include:
   - drupal
+  - php.ng.sqlite
+  - php.ng.gd
+  - php.ng.cli.ini
 
 
 
 sqlite3:
   pkg.installed
 
-#TODO php5-packeags will later be managed by own formula
-
-php5-sqlite:
-  pkg.installed
-
-# TODO php.ini needs an option sendmail_path = /bin/true
-
-php5-gd:
-  pkg.installed
 
 
-drupal-site-install-via-drush:
+drupal-site-install-via-drush-with-sqlite:
   cmd.run:
-    - name: drush si -y --db-url=sqlite://{{ drupal.db_name }}.sqlite ; exit 0
+    - name: drush si -y --db-url=sqlite://{{ drupal.db_name }}.sqlite  --account-name=admin --account-pass=admin
     - cwd: {{ drupal.doc_root  }}/drupal-{{ drupal.version }}
     - creates: {{ drupal.doc_root  }}/drupal-{{ drupal.version }}/{{drupal.db_name }}.sqlite
     - user: {{ drupal.user }}
+    - require:
+      - sls: php.ng.sqlite
+      - sls: php.ng.gd
+      - pkg: sqlite3
+      - sls: php.ng.cli.ini
+
 
 

@@ -2,23 +2,36 @@
 
 include:
   - drupal
+  - php.ng.mysql
+  - php.ng.cli.ini
+  - php.ng.gd
+{%- if drupal.db_host == '127.0.0.1' or drupal.db_host == 'localhost' %}
+  - mysql.server
+  - mysql.python
+  - mysql.user
+  - mysql.database
+{% endif %}
 
 
 
-#TODO php5-packeags will later be managed by own formula
 
-php5-mysql:
-  pkg.installed
-
-# TODO php.ini needs an option sendmail_path = /bin/true
-
-
-
-drupal-site-install-via-drush:
+drupal-site-install-via-drush-with-mysql:
   cmd.run:
-    - name: drush si -y --db-url=sqlite://{{ drupal.db_name }}.sqlite ; exit 0
+    - name: drush si -y --db-url=mysql://{{ drupal.db_user }}:{{ drupal.db_pass }}@{{ drupal.db_host }}/{{ drupal.db_name }} --account-name=admin --account-pass=admin
     - cwd: {{ drupal.doc_root  }}/drupal-{{ drupal.version }}
-    - only_if:
-      - cmd: drush status | grep Database | grep Connected
+    - unless:
+      - drush status | grep Database | grep Connected
     - user: {{ drupal.user }}
+    - require:
+      - sls: php.ng.mysql
+      - sls: php.ng.cli.ini
+      - sls: php.ng.gd
+      {%- if drupal.db_host == '127.0.0.1' or drupal.db_host == 'localhost' %}
+      - sls: mysql.server
+      - sls: mysql.python
+      - sls: mysql.user
+      - sls: mysql.database
+      {% endif %}
+
+
 

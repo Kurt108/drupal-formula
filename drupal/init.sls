@@ -1,7 +1,23 @@
 {% from "drupal/map.jinja" import drupal with context %}
 
-# can have more option s(like source, pear, ..) but is installed as a base
+include:
+  - nginx.ng.service
 
+
+extend:
+  nginx_service:
+    service:
+      - watch:
+        - file: drupal-vhost-config
+      - require:
+        - file: drupal-vhost-config
+
+
+
+
+
+
+# might have more options to install (like source, pear, ..)
 drush:
   pkg.installed
 
@@ -39,6 +55,13 @@ drupal-truncate-user:
 
 
 
+drupal-vhost-config:
+  file.managed:
+    - name: /etc/nginx/conf.d/drupal
+    - source: salt://drupal/files/nginx-config.conf
+    - template: jinja
+    - context:
+        drupal: {{ drupal }}
 
 
 

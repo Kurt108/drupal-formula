@@ -13,7 +13,7 @@ drupal-download-via-drush:
     - creates: {{ drupal.doc_root  }}/drupal-{{ drupal.version }}/index.php
     - user: {{ drupal.user }}
     - require_in:
-      - cmd: drupal-site-install-via-drush
+      - cmd: drupal-site-install-via-drush-with-{{ drupal.database }}
 
 
 settings:
